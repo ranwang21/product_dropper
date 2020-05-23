@@ -1,0 +1,4 @@
+server/node_modules
+server/config/awsConfig.json
+server/config/default.json
+web/node_modules

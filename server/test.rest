@@ -1,0 +1,26 @@
+###
+POST http://localhost:5000/add/ HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
+
+image=chicken-wings&name=chicken-wings&quantity=11&price=88&colour=yellow
+
+###
+GET http://localhost:5000/products/ HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
+
+###
+GET http://localhost:5000/products/edit/5ec6aa9e12d6123e0c0f39ee HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
+
+###
+POST http://localhost:5000/products/5ec6cd2ef0ffbb1480f4f53b HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
+
+###
+PUT http://localhost:5000/products/edit/5ec6aa9e12d6123e0c0f39ee HTTP/1.1
+Content-Type: application/x-www-form-urlencoded
+
+image=789modified&name=product3modified&quantity=10&price=89&colour=pink
+
+###
+GET http://localhost:5000/products/search/?keyword=chicken/ HTTP/1.1
