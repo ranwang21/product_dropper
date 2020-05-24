@@ -27,7 +27,7 @@ const profileImgUpload = multer({
    cb(null, path.basename( file.originalname ) )
   }
  }),
- limits:{ fileSize: 2000000 }, // 20mb
+ limits:{ fileSize: 20000000 }, // 20mb
  fileFilter: function( req, file, cb ){
   checkFileType( file, cb )
  }

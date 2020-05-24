@@ -49,8 +49,11 @@ export default class ProductModal extends Component {
 
     handleSave () {
         // add product image to aws s3
-        this.saveImageToS3()
+        this.saveImageToS3(this.handleAddProduct)
+
         this.props.onHandleAddProduct(this.state)
+
+        // initialize local state
         this.setState(initialState)
     }
 
@@ -68,15 +71,13 @@ export default class ProductModal extends Component {
             })
                 .then(response => {
                     if (response.status === 200) {
-                        // const fileName = response.data
-                        // console.log('filedata', fileName)
-                        return true
+                        const fileName = response.data
+                        console.log('filedata', fileName)
                     }
                 })
         } else {
             // if file not selected throw error
             window.alert('please select a file.')
-            return false
         }
     }
 

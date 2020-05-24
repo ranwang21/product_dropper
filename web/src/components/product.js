@@ -4,6 +4,7 @@ import { faTimes } from '@fortawesome/free-solid-svg-icons'
 
 export default function Product (props) {
     const { product, onHandleDeleteProduct } = props
+
     return (
         <div className='card w-25 text-center pt-4'>
             <div>
