@@ -159,4 +159,14 @@ router.post('/upload-image', (req, res) => {
     })
 })
 
+// get all existing schemas
+router.get('/schemas', (req, res) => {
+    const schemas = [];
+    mongoose.modelNames().forEach(modelName =>{
+        schemas.push(mongoose.model(modelName).schema.obj);
+    })
+
+    res.status(OK).json(schemas)
+})
+
 module.exports = router

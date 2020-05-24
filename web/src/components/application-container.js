@@ -26,8 +26,10 @@ export default class ApplicationContainer extends Component {
         super()
         this.state = {
             products: [],
+            attributes: {},
             showModal: false,
             onSearch: false,
+            searchResults: [],
             errMsg: [],
             loading: true,
             imageFile: '',
@@ -44,6 +46,22 @@ export default class ApplicationContainer extends Component {
         this.generateUUID = this.generateUUID.bind(this)
         this.handleSave = this.handleSave.bind(this)
         this.handleDragFile = this.handleDragFile.bind(this)
+        this.handleSearch = this.handleSearch.bind(this)
+        this.renderProducts = this.renderProducts.bind(this)
+        this.fetchAttributes = this.fetchAttributes.bind(this)
+    }
+
+    handleSearch (keyword) {
+        const products = this.state.products
+        const key = keyword.toString().toLowerCase()
+        if (key.trim() !== '') {
+            this.setState({ onSearch: true })
+            this.setState({
+                searchResults: products.filter(product => product.name.toString().toLowerCase().includes(keyword))
+            })
+        } else {
+            this.setState({ onSearch: false })
+        }
     }
 
     handleChooseImage (event) {
@@ -181,18 +199,29 @@ export default class ApplicationContainer extends Component {
         })
     }
 
+    fetchAttributes () {
+        axios.get('http://localhost:5000/schemas')
+            .then(response => this.setState({ attributes: response.data[0] }))
+    }
+
     componentDidMount () {
+        this.fetchAttributes()
         this.fetchProducts()
+    }
+
+    renderProducts () {
+        return this.state.onSearch ? <Products products={this.state.searchResults} onHandleDeleteProduct={this.handleDeleteProduct} />
+            : <Products products={this.state.products} onHandleDeleteProduct={this.handleDeleteProduct} />
     }
 
     render () {
         return (
             <div className='container'>
-                <Header onHandleOpenModal={this.handleOpenModal} onHandleDragFile={this.handleDragFile} />
+                <Header onHandleOpenModal={this.handleOpenModal} onHandleDragFile={this.handleDragFile} onHandleSearch={this.handleSearch} />
 
                 {this.state.loading
                     ? <BarLoader css={override} height={4} width={100} color='#123abc' loading={this.state.loading} />
-                    : <Products products={this.state.products} onHandleDeleteProduct={this.handleDeleteProduct} />}
+                    : this.renderProducts()}
                 <ProductModal errMsg={this.state.errMsg} onHandleCloseModal={this.handleCloseModal} showModal={this.state.showModal} onHandleAddProduct={this.handleAddProduct} onHandleChooseImage={this.handleChooseImage} preview={this.state.preview} onHandleSave={this.handleSave} />
             </div>
         )

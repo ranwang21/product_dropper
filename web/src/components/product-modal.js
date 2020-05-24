@@ -17,61 +17,29 @@ const customStyles = {
 }
 
 const initialState = {
-    imageFile: '',
-    name: '',
-    quantity: '',
-    price: '',
-    colour: ''
+    name: 'product ' + Date.now(),
+    quantity: '1',
+    price: '1',
+    colour: 'white'
 }
 
 export default class ProductModal extends Component {
     constructor () {
         super()
         this.state = {
-            name: '',
-            quantity: '',
-            price: '',
-            colour: ''
+            name: 'product ' + Date.now(),
+            quantity: '1',
+            price: '1',
+            colour: 'white',
+            additionalAttributes: []
         }
 
         this.handleChange = this.handleChange.bind(this)
         this.handleModalSave = this.handleModalSave.bind(this)
         this.handleCancle = this.handleCancle.bind(this)
+        this.handleAddMoreField = this.handleAddMoreField.bind(this)
+        this.renderAdditionalFields = this.renderAdditionalFields.bind(this)
     }
-
-    // handleSave () {
-    //     // add product image to aws s3
-    //     this.saveImageToS3()
-
-    //     this.props.onHandleAddProduct(this.state)
-
-    //     // initialize local state
-    //     this.setState(initialState)
-    // }
-
-    // saveImageToS3 () {
-    //     const data = new FormData()
-    //     // if file selected
-    //     if (this.state.imageFile) {
-    //         data.append('image', this.state.imageFile, this.state.imageFile.name)
-    //         axios.post('http://localhost:5000/upload-image', data, {
-    //             headers: {
-    //                 accept: 'application/json',
-    //                 'Accept-Language': 'en-US,en;q=0.8',
-    //                 'Content-Type': `multipart/form-data; boundary=${data._boundary}`
-    //             }
-    //         })
-    //             .then(response => {
-    //                 if (response.status === 200) {
-    //                     const fileName = response.data
-    //                     console.log('filedata', fileName)
-    //                 }
-    //             })
-    //     } else {
-    //         // if file not selected throw error
-    //         window.alert('please select a file.')
-    //     }
-    // }
 
     handleCancle () {
         // add product to database then initiate the local state
@@ -93,38 +61,11 @@ export default class ProductModal extends Component {
     }
 
     handleOnOpen () {
-        console.log('open')
-        this.setState({ preview: '' })
+        this.setState({
+            additionalFields: [],
+            preview: ''
+        })
     }
-
-    // handleChooseImage (event) {
-    //     event.stopPropagation()
-    //     event.preventDefault()
-    //     const originalFile = event.target.files[0]
-    //     // change the fileName so it shall be unique
-    //     const newFile = new File([originalFile], this.formatImageFileName(originalFile.name))
-    //     this.setState({
-    //         imageFile: newFile,
-    //         // create a local url to preview the chosen image
-    //         preview: URL.createObjectURL(originalFile)
-    //     })
-    // }
-
-    // formatImageFileName (fileName) {
-    //     const extName = this.getFileExtension(fileName)
-    //     return fileName + this.generateUUID() + '.' + extName
-    // }
-
-    // getFileExtension (fileName) {
-    //     return (/[.]/.exec(fileName)) ? /[^.]+$/.exec(fileName)[0] : undefined
-    // }
-
-    // generateUUID () {
-    //     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-    //         var r = Math.random() * 16 | 0; var v = c === 'x' ? r : (r & 0x3 | 0x8)
-    //         return v.toString(16)
-    //     })
-    // }
 
     handleModalSave () {
         const product = {
@@ -135,6 +76,31 @@ export default class ProductModal extends Component {
         }
         this.props.onHandleSave(product)
         this.setState(initialState)
+    }
+
+    /**
+     * add more field to the form when click add more field button
+     */
+    handleAddMoreField () {
+        this.setState({ additionalAttributes: this.state.additionalAttributes.push(`input+${Date.now}`) }, () => console.log(this.state.additionalAttributes))
+    }
+
+    /**
+     * render additional fields
+     */
+    renderAdditionalFields () {
+        if (this.state.additionalAttributes.length > 0) {
+            this.state.additionalAttributes.map(field => {
+                return (
+                    <>
+                        <label htmlFor='colour' className='col-sm-2 col-form-label'>Additional</label>
+                        <div className='col-sm-10'>
+                            <input type='text' className='form-control' id='colour' name='colour' />
+                        </div>
+                    </>
+                )
+            })
+        }
     }
 
     render () {
@@ -173,14 +139,14 @@ export default class ProductModal extends Component {
                         <div className='form-group row'>
                             <label htmlFor='quantity' className='col-sm-2 col-form-label'>Quantity</label>
                             <div className='col-sm-10'>
-                                <input type='number' className='form-control' id='quantity' name='quantity' onChange={this.handleChange} value={this.state.quantity} />
+                                <input min='0' type='number' className='form-control' id='quantity' name='quantity' onChange={this.handleChange} value={this.state.quantity} />
                             </div>
                         </div>
 
                         <div className='form-group row'>
-                            <label htmlFor='price' className='col-sm-2 col-form-label'>Price</label>
+                            <label htmlFor='price' className='col-sm-2 col-form-label'>Price ($)</label>
                             <div className='col-sm-10'>
-                                <input type='number' className='form-control' id='Price' name='price' onChange={this.handleChange} value={this.state.price} />
+                                <input min='0' type='number' className='form-control' id='Price' name='price' onChange={this.handleChange} value={this.state.price} />
                             </div>
                         </div>
 
@@ -191,9 +157,14 @@ export default class ProductModal extends Component {
                             </div>
                         </div>
 
+                        <div className='form-group row'>
+                            {this.renderAdditionalFields()}
+                        </div>
+
                     </form>
 
                     <div className='modal-footer'>
+                        <button type='button' className='btn btn-success' onClick={this.handleAddMoreField}>Add Attribute</button>
                         <button type='button' className='btn btn-primary' onClick={this.handleModalSave}>Save</button>
                         <button type='button' className='btn btn-secondary' data-dismiss='modal' onClick={this.handleCancle}>Cancle</button>
                     </div>

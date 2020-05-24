@@ -24,3 +24,6 @@ image=789modified&name=product3modified&quantity=10&price=89&colour=pink
 
 ###
 GET http://localhost:5000/products/search/?keyword=chicken/ HTTP/1.1
+
+###
+GET http://localhost:5000/schemas HTTP/1.1
