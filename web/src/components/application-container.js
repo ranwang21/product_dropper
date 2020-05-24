@@ -16,6 +16,11 @@ const override = css`
   border-color: slategrey;
 `
 
+const initalStates = {
+    imageFile: '',
+    preview: `https://${awsConfig.bucket}.s3.us-east-2.amazonaws.com/default.jpg`
+}
+
 export default class ApplicationContainer extends Component {
     constructor () {
         super()
@@ -86,7 +91,10 @@ export default class ApplicationContainer extends Component {
         this.handleAddProduct(product)
 
         // // initialize local state
-        // this.setState(initialState)
+        this.setState({
+            imageFile: initalStates.imageFile,
+            preview: initalStates.preview
+        })
     }
 
     handleAddProduct (product) {

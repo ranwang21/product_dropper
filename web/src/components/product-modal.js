@@ -1,7 +1,5 @@
 import React, { Component } from 'react'
 import Modal from 'react-modal'
-import axios from 'axios'
-const awsConfig = require('../../../server/config/awsConfig.json')
 
 // connect modal to the app for screen readers
 Modal.setAppElement('#app')
@@ -20,8 +18,6 @@ const customStyles = {
 
 const initialState = {
     imageFile: '',
-    // default preview image
-    preview: 'https://youtube-images-1123.s3.us-east-2.amazonaws.com/default.jpg',
     name: '',
     quantity: '',
     price: '',
@@ -32,9 +28,6 @@ export default class ProductModal extends Component {
     constructor () {
         super()
         this.state = {
-            imageFile: '',
-            // default preview image
-            preview: `https://${awsConfig.bucket}.s3.us-east-2.amazonaws.com/default.jpg`,
             name: '',
             quantity: '',
             price: '',
@@ -164,7 +157,6 @@ export default class ProductModal extends Component {
                                 {/* use a hidden input to receive image file */}
                                 <input name='image' onChange={onHandleChooseImage} type='file' ref='upload' style={{ display: 'none' }} />
                             </div>
-                            <label>{this.state.imageFile !== '' ? this.state.imageFile.name : null}</label>
                             <div className='alert alert-light mb-0' role='alert'>
                                 You can <a href='#' onClick={() => this.refs.upload.click()} className='alert-link m-0'>choose an image</a>. Supported image format: .jpg, .jpeg, .png, .gif.
                             </div>
