@@ -43,12 +43,24 @@ export default class ApplicationContainer extends Component {
         this.getFileExtension = this.getFileExtension.bind(this)
         this.generateUUID = this.generateUUID.bind(this)
         this.handleSave = this.handleSave.bind(this)
+        this.handleDragFile = this.handleDragFile.bind(this)
     }
 
     handleChooseImage (event) {
         event.stopPropagation()
         event.preventDefault()
         const originalFile = event.target.files[0]
+        // change the fileName so it shall be unique
+        const newFile = new File([originalFile], this.formatImageFileName(originalFile.name))
+        this.setState({
+            imageFile: newFile,
+            // create a local url to preview the chosen image
+            preview: URL.createObjectURL(originalFile)
+        })
+    }
+
+    handleDragFile (file) {
+        const originalFile = file
         // change the fileName so it shall be unique
         const newFile = new File([originalFile], this.formatImageFileName(originalFile.name))
         this.setState({
@@ -81,7 +93,11 @@ export default class ApplicationContainer extends Component {
     }
 
     handleCloseModal () {
-        this.setState({ showModal: false })
+        this.setState({
+            showModal: false,
+            imageFile: initalStates.imageFile,
+            preview: initalStates.preview
+        })
     }
 
     handleSave (product) {
@@ -116,7 +132,7 @@ export default class ApplicationContainer extends Component {
                 setTimeout(() => {
                     this.fetchProducts()
                     // temporary solution: wait for .8s for image upload on s3
-                }, 800)
+                }, 1000)
                 this.handleCloseModal()
             }
         })
@@ -172,7 +188,7 @@ export default class ApplicationContainer extends Component {
     render () {
         return (
             <div className='container'>
-                <Header onHandleOpenModal={this.handleOpenModal} />
+                <Header onHandleOpenModal={this.handleOpenModal} onHandleDragFile={this.handleDragFile} />
 
                 {this.state.loading
                     ? <BarLoader css={override} height={4} width={100} color='#123abc' loading={this.state.loading} />

@@ -1,24 +1,26 @@
 import React from 'react'
 import { useDropzone } from 'react-dropzone'
 
-export default function DragZone (props) {
-    const { acceptedFiles, getRootProps, getInputProps } = useDropzone({ onDrop: files => console.log(files[0]) })
+const handleOnDrag = (onHandleOpenModal, onHandleDragFile, file) => {
+    onHandleOpenModal()
+    onHandleDragFile(file)
+    console.log(file)
+}
 
-    // const files = acceptedFiles.map(file => (
-    //     <li key={file.path}>
-    //         {file.path} - {file.size} bytes
-    //     </li>
-    // ))
+export default function DragZone (props) {
+    const { onHandleOpenModal, onHandleDragFile } = props
+    const { acceptedFiles, getRootProps, getInputProps } = useDropzone({ onDrop: (files) => handleOnDrag(onHandleOpenModal, onHandleDragFile, files[0]) })
 
     return (
-        <div>
-            <div {...getRootProps()}>
+        <section className='container'>
+            <div {...getRootProps({ className: 'dropzone disabled' })}>
                 <input {...getInputProps()} />
-                <p>Drag 'n' drop some files here, or click to select files</p>
+                <p>Drag an image here to create a new product</p>
             </div>
-            {/* <ul>
-                {files}
-            </ul> */}
-        </div>
+            {/* <aside>
+                <h4>Files</h4>
+                <ul>{files}</ul>
+            </aside> */}
+        </section>
     )
 }
