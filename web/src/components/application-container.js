@@ -6,6 +6,9 @@ import ProductModal from './product-modal'
 import { css } from '@emotion/core'
 import BarLoader from 'react-spinners/BarLoader'
 
+// get aws credentials config
+const awsConfig = require('../../../server/config/awsConfig.json')
+
 // style for loading spinner
 const override = css`
   display: block;
@@ -21,13 +24,49 @@ export default class ApplicationContainer extends Component {
             showModal: false,
             onSearch: false,
             errMsg: [],
-            loading: true
+            loading: true,
+            imageFile: '',
+            preview: `https://${awsConfig.bucket}.s3.us-east-2.amazonaws.com/default.jpg`
         }
 
         this.handleOpenModal = this.handleOpenModal.bind(this)
         this.handleCloseModal = this.handleCloseModal.bind(this)
         this.handleDeleteProduct = this.handleDeleteProduct.bind(this)
         this.handleAddProduct = this.handleAddProduct.bind(this)
+        this.handleChooseImage = this.handleChooseImage.bind(this)
+        this.formatImageFileName = this.formatImageFileName.bind(this)
+        this.getFileExtension = this.getFileExtension.bind(this)
+        this.generateUUID = this.generateUUID.bind(this)
+        this.handleSave = this.handleSave.bind(this)
+    }
+
+    handleChooseImage (event) {
+        event.stopPropagation()
+        event.preventDefault()
+        const originalFile = event.target.files[0]
+        // change the fileName so it shall be unique
+        const newFile = new File([originalFile], this.formatImageFileName(originalFile.name))
+        this.setState({
+            imageFile: newFile,
+            // create a local url to preview the chosen image
+            preview: URL.createObjectURL(originalFile)
+        })
+    }
+
+    formatImageFileName (fileName) {
+        const extName = this.getFileExtension(fileName)
+        return fileName + this.generateUUID() + '.' + extName
+    }
+
+    getFileExtension (fileName) {
+        return (/[.]/.exec(fileName)) ? /[^.]+$/.exec(fileName)[0] : undefined
+    }
+
+    generateUUID () {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16 | 0; var v = c === 'x' ? r : (r & 0x3 | 0x8)
+            return v.toString(16)
+        })
     }
 
     handleOpenModal () {
@@ -40,12 +79,22 @@ export default class ApplicationContainer extends Component {
         this.setState({ showModal: false })
     }
 
+    handleSave (product) {
+        // add product image to aws s3
+        this.saveImageToS3()
+
+        this.handleAddProduct(product)
+
+        // // initialize local state
+        // this.setState(initialState)
+    }
+
     handleAddProduct (product) {
         console.log('add product...')
         console.log(product)
         axios.post('http://localhost:5000/add', {
             // add a uuid to the imagefile name to avoid duplicates
-            image: product.imageFile.name,
+            image: this.state.imageFile.name,
             name: product.name,
             quantity: product.quantity,
             price: product.price,
@@ -63,6 +112,30 @@ export default class ApplicationContainer extends Component {
                 this.handleCloseModal()
             }
         })
+    }
+
+    saveImageToS3 () {
+        const data = new FormData()
+        // if file selected
+        if (this.state.imageFile) {
+            data.append('image', this.state.imageFile, this.state.imageFile.name)
+            axios.post('http://localhost:5000/upload-image', data, {
+                headers: {
+                    accept: 'application/json',
+                    'Accept-Language': 'en-US,en;q=0.8',
+                    'Content-Type': `multipart/form-data; boundary=${data._boundary}`
+                }
+            })
+                .then(response => {
+                    if (response.status === 200) {
+                        const fileName = response.data
+                        console.log('filedata', fileName)
+                    }
+                })
+        } else {
+            // if file not selected throw error
+            window.alert('please select a file.')
+        }
     }
 
     fetchProducts () {
@@ -96,7 +169,7 @@ export default class ApplicationContainer extends Component {
                 {this.state.loading
                     ? <BarLoader css={override} height={4} width={100} color='#123abc' loading={this.state.loading} />
                     : <Products products={this.state.products} onHandleDeleteProduct={this.handleDeleteProduct} />}
-                <ProductModal errMsg={this.state.errMsg} onHandleCloseModal={this.handleCloseModal} showModal={this.state.showModal} onHandleAddProduct={this.handleAddProduct} />
+                <ProductModal errMsg={this.state.errMsg} onHandleCloseModal={this.handleCloseModal} showModal={this.state.showModal} onHandleAddProduct={this.handleAddProduct} onHandleChooseImage={this.handleChooseImage} preview={this.state.preview} onHandleSave={this.handleSave} />
             </div>
         )
     }

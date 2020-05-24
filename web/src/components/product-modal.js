@@ -42,44 +42,43 @@ export default class ProductModal extends Component {
         }
 
         this.handleChange = this.handleChange.bind(this)
-        this.handleSave = this.handleSave.bind(this)
-        this.handleChooseImage = this.handleChooseImage.bind(this)
+        this.handleModalSave = this.handleModalSave.bind(this)
         this.handleCancle = this.handleCancle.bind(this)
     }
 
-    handleSave () {
-        // add product image to aws s3
-        this.saveImageToS3(this.handleAddProduct)
+    // handleSave () {
+    //     // add product image to aws s3
+    //     this.saveImageToS3()
 
-        this.props.onHandleAddProduct(this.state)
+    //     this.props.onHandleAddProduct(this.state)
 
-        // initialize local state
-        this.setState(initialState)
-    }
+    //     // initialize local state
+    //     this.setState(initialState)
+    // }
 
-    saveImageToS3 () {
-        const data = new FormData()
-        // if file selected
-        if (this.state.imageFile) {
-            data.append('image', this.state.imageFile, this.state.imageFile.name)
-            axios.post('http://localhost:5000/upload-image', data, {
-                headers: {
-                    accept: 'application/json',
-                    'Accept-Language': 'en-US,en;q=0.8',
-                    'Content-Type': `multipart/form-data; boundary=${data._boundary}`
-                }
-            })
-                .then(response => {
-                    if (response.status === 200) {
-                        const fileName = response.data
-                        console.log('filedata', fileName)
-                    }
-                })
-        } else {
-            // if file not selected throw error
-            window.alert('please select a file.')
-        }
-    }
+    // saveImageToS3 () {
+    //     const data = new FormData()
+    //     // if file selected
+    //     if (this.state.imageFile) {
+    //         data.append('image', this.state.imageFile, this.state.imageFile.name)
+    //         axios.post('http://localhost:5000/upload-image', data, {
+    //             headers: {
+    //                 accept: 'application/json',
+    //                 'Accept-Language': 'en-US,en;q=0.8',
+    //                 'Content-Type': `multipart/form-data; boundary=${data._boundary}`
+    //             }
+    //         })
+    //             .then(response => {
+    //                 if (response.status === 200) {
+    //                     const fileName = response.data
+    //                     console.log('filedata', fileName)
+    //                 }
+    //             })
+    //     } else {
+    //         // if file not selected throw error
+    //         window.alert('please select a file.')
+    //     }
+    // }
 
     handleCancle () {
         // add product to database then initiate the local state
@@ -105,37 +104,48 @@ export default class ProductModal extends Component {
         this.setState({ preview: '' })
     }
 
-    handleChooseImage (event) {
-        event.stopPropagation()
-        event.preventDefault()
-        const originalFile = event.target.files[0]
-        // change the fileName so it shall be unique
-        const newFile = new File([originalFile], this.formatImageFileName(originalFile.name))
-        this.setState({
-            imageFile: newFile,
-            // create a local url to preview the chosen image
-            preview: URL.createObjectURL(originalFile)
-        })
-    }
+    // handleChooseImage (event) {
+    //     event.stopPropagation()
+    //     event.preventDefault()
+    //     const originalFile = event.target.files[0]
+    //     // change the fileName so it shall be unique
+    //     const newFile = new File([originalFile], this.formatImageFileName(originalFile.name))
+    //     this.setState({
+    //         imageFile: newFile,
+    //         // create a local url to preview the chosen image
+    //         preview: URL.createObjectURL(originalFile)
+    //     })
+    // }
 
-    formatImageFileName (fileName) {
-        const extName = this.getFileExtension(fileName)
-        return fileName + this.generateUUID() + '.' + extName
-    }
+    // formatImageFileName (fileName) {
+    //     const extName = this.getFileExtension(fileName)
+    //     return fileName + this.generateUUID() + '.' + extName
+    // }
 
-    getFileExtension (fileName) {
-        return (/[.]/.exec(fileName)) ? /[^.]+$/.exec(fileName)[0] : undefined
-    }
+    // getFileExtension (fileName) {
+    //     return (/[.]/.exec(fileName)) ? /[^.]+$/.exec(fileName)[0] : undefined
+    // }
 
-    generateUUID () {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-            var r = Math.random() * 16 | 0; var v = c === 'x' ? r : (r & 0x3 | 0x8)
-            return v.toString(16)
-        })
+    // generateUUID () {
+    //     return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    //         var r = Math.random() * 16 | 0; var v = c === 'x' ? r : (r & 0x3 | 0x8)
+    //         return v.toString(16)
+    //     })
+    // }
+
+    handleModalSave () {
+        const product = {
+            name: this.state.name,
+            quantity: this.state.quantity,
+            price: this.state.price,
+            colour: this.state.colour
+        }
+        this.props.onHandleSave(product)
+        this.setState(initialState)
     }
 
     render () {
-        const { showModal, errMsg } = this.props
+        const { showModal, errMsg, onHandleChooseImage, preview } = this.props
         return (
             <div>
                 <Modal
@@ -150,9 +160,9 @@ export default class ProductModal extends Component {
                     <form>
                         <div className='container-fluid text-center'>
                             <div className='text-center'>
-                                <img src={this.state.preview} className='rounded mx-auto' alt='...' width='200' height='200' />
+                                <img src={preview} className='rounded mx-auto' alt='...' width='200' height='200' />
                                 {/* use a hidden input to receive image file */}
-                                <input name='image' onChange={this.handleChooseImage} type='file' ref='upload' style={{ display: 'none' }} />
+                                <input name='image' onChange={onHandleChooseImage} type='file' ref='upload' style={{ display: 'none' }} />
                             </div>
                             <label>{this.state.imageFile !== '' ? this.state.imageFile.name : null}</label>
                             <div className='alert alert-light mb-0' role='alert'>
@@ -192,7 +202,7 @@ export default class ProductModal extends Component {
                     </form>
 
                     <div className='modal-footer'>
-                        <button type='button' className='btn btn-primary' onClick={this.handleSave}>Save</button>
+                        <button type='button' className='btn btn-primary' onClick={this.handleModalSave}>Save</button>
                         <button type='button' className='btn btn-secondary' data-dismiss='modal' onClick={this.handleCancle}>Cancle</button>
                     </div>
                 </Modal>
