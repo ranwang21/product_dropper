@@ -5,6 +5,8 @@ The products details are stored in MongoDB (local or remote) and the products im
 React, AWS, MongoDB
 
 ## Installation
+Before you do anything, you need to install MongoDB.
+
 __Start the Server__
 
 - in `/server/config`, create a json file `awsConfig.json` and write in this file as follows:\
