@@ -1,5 +1,5 @@
 # About
-This app allows user to add or delete products catalog by input or by drap and drop.
+This app allows user to add or delete products catalog by submiting a form or by drag and drop.
 The products details are stored in MongoDB (local or remote) and the products images are stored in a AWS S3 bucket which you can configure the project to use your own bucket.
 ## Tech stack
 React, AWS, MongoDB
@@ -23,3 +23,7 @@ __Start the client__
 - Start the local server `npm run dev`.
 
 You should see the index page prompt in your default browser, if not, visit `localhost:8080` to see the app.
+
+## Preview
+![](preview/Capture1.PNG)
+![](preview/Capture2.PNG)
