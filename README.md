@@ -15,6 +15,7 @@ __Start the Server__
     "bucket": "YOUR BUCKET NAME"
 }
 ```
+Please note that if you use your own aws bucket you will need to allow public `put` and `read` to your S3 bucket.
 - Open terminal in the `/server` folder, make sure port `5000` in your localhost is available, then install the dependencies by `npm install`;
 - Start the local server `npm start`.
 
