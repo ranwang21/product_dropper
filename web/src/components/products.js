@@ -7,7 +7,7 @@ export default class Products extends Component {
     }
 
     render () {
-        const { products, onHandleDeleteProduct, newProductImage } = this.props
+        const { products, onHandleDeleteProduct } = this.props
         return (
             <div className='d-flex pt-3 bd-highlight flex-wrap'>
                 {products.length > 0 ? this.renderProducts(products, onHandleDeleteProduct) : <p><b>No products found</b></p>}

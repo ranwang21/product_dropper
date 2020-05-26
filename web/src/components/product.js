@@ -2,6 +2,13 @@ import React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTimes } from '@fortawesome/free-solid-svg-icons'
 
+const renderAdditionalAttribute = product => {
+    if (product.additionalAttribute.additionalAttributeName.length > 0) {
+        console.log('called')
+        return <p className='card-text'>{product.additionalAttribute.additionalAttributeName}: {product.additionalAttribute.additionalAttribtueValue}</p>
+    }
+}
+
 export default function Product (props) {
     const { product, onHandleDeleteProduct } = props
 
@@ -15,6 +22,7 @@ export default function Product (props) {
                 <p className='card-text'>Price: {product.price}</p>
                 <p className='card-text'>{product.quantity > 0 ? 'Quantity: ' + product.quantity : <b><i>Out of order</i></b>}</p>
                 <p className='card-text'>Colour: {product.colour}</p>
+                {renderAdditionalAttribute(product)}
                 <button onClick={() => onHandleDeleteProduct(product._id)}><FontAwesomeIcon icon={faTimes} /></button>
             </div>
         </div>

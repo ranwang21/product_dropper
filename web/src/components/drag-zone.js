@@ -58,10 +58,6 @@ export default function DragZone (props) {
                 <input {...getInputProps()} />
                 <p>Drag an image here or click to create a new product</p>
             </div>
-            {/* <aside>
-                <h4>Files</h4>
-                <ul>{files}</ul>
-            </aside> */}
         </section>
     )
 }

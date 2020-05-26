@@ -20,7 +20,10 @@ const initialState = {
     name: 'product ' + Date.now(),
     quantity: '1',
     price: '1',
-    colour: 'white'
+    colour: 'white',
+    additionalAttributeName: '',
+    additionalAttribtueValue: '',
+    showAdditionalField: false
 }
 
 export default class ProductModal extends Component {
@@ -31,22 +34,31 @@ export default class ProductModal extends Component {
             quantity: '1',
             price: '1',
             colour: 'white',
-            additionalAttributes: []
+            additionalAttributeName: '',
+            additionalAttribtueValue: '',
+            showAdditionalField: false
         }
 
         this.handleChange = this.handleChange.bind(this)
         this.handleModalSave = this.handleModalSave.bind(this)
         this.handleCancle = this.handleCancle.bind(this)
         this.handleAddMoreField = this.handleAddMoreField.bind(this)
-        this.renderAdditionalFields = this.renderAdditionalFields.bind(this)
+        this.renderAdditionalField = this.renderAdditionalField.bind(this)
     }
 
+    /**
+     * when cancle button clicked - close modal and init state
+     */
     handleCancle () {
         // add product to database then initiate the local state
         this.props.onHandleCloseModal()
-        this.setState(initialState, () => console.log(this.state.preview))
+        this.setState(initialState)
     }
 
+    /**
+     * change input state
+     * @param {*}
+     */
     handleChange (event) {
         const value = event.target.value
         this.setState({
@@ -54,25 +66,37 @@ export default class ProductModal extends Component {
         })
     }
 
+    /**
+     * Show error message if exist
+     * @param {*} errMsg array
+     */
     renderErrorMessages (errMsg) {
         if (Array.isArray(errMsg) && errMsg.length > 0) {
             return errMsg.map((err, index) => <div key={index} className='alert alert-danger' role='alert'>{err.text}</div>)
         }
     }
 
+    /**
+     * When the modal is open
+     */
     handleOnOpen () {
         this.setState({
-            additionalFields: [],
+            showAdditionalField: false,
             preview: ''
         })
     }
 
+    /**
+     * When save is clicked, call handleSave method from the app container
+     */
     handleModalSave () {
         const product = {
             name: this.state.name,
             quantity: this.state.quantity,
             price: this.state.price,
-            colour: this.state.colour
+            colour: this.state.colour,
+            additionalAttributeName: this.state.additionalAttributeName,
+            additionalAttribtueValue: this.state.additionalAttribtueValue
         }
         this.props.onHandleSave(product)
         this.setState(initialState)
@@ -82,25 +106,21 @@ export default class ProductModal extends Component {
      * add more field to the form when click add more field button
      */
     handleAddMoreField () {
-        this.setState({ additionalAttributes: this.state.additionalAttributes.push(`input+${Date.now}`) }, () => console.log(this.state.additionalAttributes))
+        this.setState({ showAdditionalField: true })
     }
 
     /**
-     * render additional fields
+     * renders additional inputs when user need
      */
-    renderAdditionalFields () {
-        if (this.state.additionalAttributes.length > 0) {
-            this.state.additionalAttributes.map(field => {
-                return (
-                    <>
-                        <label htmlFor='colour' className='col-sm-2 col-form-label'>Additional</label>
-                        <div className='col-sm-10'>
-                            <input type='text' className='form-control' id='colour' name='colour' />
-                        </div>
-                    </>
-                )
-            })
-        }
+    renderAdditionalField () {
+        return (
+            <div className='form-group row'>
+                <input name='additionalAttributeName' className='col-sm-2' onChange={this.handleChange} value={this.state.additionalAttributeName} />
+                <div className='col-sm-10'>
+                    <input type='text' className='form-control' id='name' name='additionalAttribtueValue' onChange={this.handleChange} value={this.state.additionalAttribtueValue} />
+                </div>
+            </div>
+        )
     }
 
     render () {
@@ -157,9 +177,10 @@ export default class ProductModal extends Component {
                             </div>
                         </div>
 
-                        <div className='form-group row'>
-                            {this.renderAdditionalFields()}
-                        </div>
+                        {/* render the additional fields */}
+                        {this.state.showAdditionalField
+                            ? this.renderAdditionalField()
+                            : null}
 
                     </form>
 

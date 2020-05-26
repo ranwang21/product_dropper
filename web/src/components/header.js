@@ -11,6 +11,10 @@ export default class Header extends Component {
         this.handleSearchKeyChange = this.handleSearchKeyChange.bind(this)
     }
 
+    /**
+     * When user type in the search bar
+     * @param {*} event
+     */
     handleSearchKeyChange (event) {
         this.setState({ searchKey: event.target.value }, () => this.props.onHandleSearch(this.state.searchKey))
     }

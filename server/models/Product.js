@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
-// create schema
+// create schema product
 const ProductSchema = new Schema({
     image:{
         type: String,
@@ -22,6 +22,10 @@ const ProductSchema = new Schema({
     colour: {
         type: String,
         required: true
+    },
+    additionalAttribute:{
+        type: Object,
+        required: false
     },
     date: {
         type: Date,

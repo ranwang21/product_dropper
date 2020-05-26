@@ -16,6 +16,7 @@ const override = css`
   border-color: slategrey;
 `
 
+// initial state on imageFile and preview
 const initalStates = {
     imageFile: '',
     preview: `https://${awsConfig.bucket}.s3.us-east-2.amazonaws.com/default.jpg`
@@ -48,9 +49,13 @@ export default class ApplicationContainer extends Component {
         this.handleDragFile = this.handleDragFile.bind(this)
         this.handleSearch = this.handleSearch.bind(this)
         this.renderProducts = this.renderProducts.bind(this)
-        this.fetchAttributes = this.fetchAttributes.bind(this)
+        // this.fetchAttributes = this.fetchAttributes.bind(this)
     }
 
+    /**
+     * when client type on search bar
+     * @param {*} keyword String
+     */
     handleSearch (keyword) {
         const products = this.state.products
         const key = keyword.toString().toLowerCase()
@@ -64,6 +69,10 @@ export default class ApplicationContainer extends Component {
         }
     }
 
+    /**
+     * When an is selected on user form
+     * @param {*} event event
+     */
     handleChooseImage (event) {
         event.stopPropagation()
         event.preventDefault()
@@ -77,6 +86,10 @@ export default class ApplicationContainer extends Component {
         })
     }
 
+    /**
+     * When an image is dragged into the drop zone
+     * @param {*} file File
+     */
     handleDragFile (file) {
         const originalFile = file
         // change the fileName so it shall be unique
@@ -88,15 +101,26 @@ export default class ApplicationContainer extends Component {
         })
     }
 
+    /**
+     * use UUID to format the image file
+     * @param {*} fileName string
+     */
     formatImageFileName (fileName) {
         const extName = this.getFileExtension(fileName)
         return fileName + this.generateUUID() + '.' + extName
     }
 
+    /**
+     * get the image file extension
+     * @param {*} fileName string
+     */
     getFileExtension (fileName) {
         return (/[.]/.exec(fileName)) ? /[^.]+$/.exec(fileName)[0] : undefined
     }
 
+    /**
+     * generate a random UUID to the imagefile
+     */
     generateUUID () {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
             var r = Math.random() * 16 | 0; var v = c === 'x' ? r : (r & 0x3 | 0x8)
@@ -104,12 +128,18 @@ export default class ApplicationContainer extends Component {
         })
     }
 
+    /**
+     * When modal is open
+     */
     handleOpenModal () {
         // clear the form error messages then open the modal
         this.setState({ errMsg: [] })
         this.setState({ showModal: true })
     }
 
+    /**
+     * when modal is closed - clear imagefile and preview
+     */
     handleCloseModal () {
         this.setState({
             showModal: false,
@@ -118,6 +148,10 @@ export default class ApplicationContainer extends Component {
         })
     }
 
+    /**
+     * when user click on `save` on user form
+     * @param {*} product product (model)
+     */
     handleSave (product) {
         // add product image to aws s3
         this.saveImageToS3()
@@ -131,16 +165,29 @@ export default class ApplicationContainer extends Component {
         })
     }
 
+    /**
+     * add product details to MongoDB
+     * @param {*} product product (model)
+     */
     handleAddProduct (product) {
-        console.log('add product...')
-        console.log(product)
+        const additionalAttributeObj = {
+            additionalAttributeName: '',
+            additionalAttribtueValue: ''
+        }
+
+        if (product.additionalAttributeName !== '' && product.additionalAttribtueValue !== '') {
+            additionalAttributeObj.additionalAttributeName = product.additionalAttributeName
+            additionalAttributeObj.additionalAttribtueValue = product.additionalAttribtueValue
+        }
+
         axios.post('http://localhost:5000/add', {
             // add a uuid to the imagefile name to avoid duplicates
             image: this.state.imageFile.name,
             name: product.name,
             quantity: product.quantity,
             price: product.price,
-            colour: product.colour
+            colour: product.colour,
+            additionalAttribute: additionalAttributeObj
         }).then(res => {
             // form validation, if erros exit, it will be an array, show errors in modal
             if (Array.isArray(res.data)) {
@@ -156,6 +203,9 @@ export default class ApplicationContainer extends Component {
         })
     }
 
+    /**
+     * upload product image to AWS S3
+     */
     saveImageToS3 () {
         const data = new FormData()
         // if file selected
@@ -180,12 +230,20 @@ export default class ApplicationContainer extends Component {
         }
     }
 
+    /**
+     * Fetch all products from MongoDB
+     */
     fetchProducts () {
         axios.get('http://localhost:5000/products')
             .then(products => this.setState({ products: products.data }))
             .then(() => this.setState({ loading: false }))
+            .then(() => console.log(this.state.products))
     }
 
+    /**
+     * Delete a product
+     * @param {*} productId String
+     */
     handleDeleteProduct (productId) {
         axios({
             method: 'POST',
@@ -199,16 +257,23 @@ export default class ApplicationContainer extends Component {
         })
     }
 
-    fetchAttributes () {
-        axios.get('http://localhost:5000/schemas')
-            .then(response => this.setState({ attributes: response.data[0] }))
-    }
+    /**
+     * Fetch all existing attributes from MongoDB. For future use only
+     */
+    // fetchAttributes () {
+    //     axios.get('http://localhost:5000/schemas')
+    //         .then(response => this.setState({ attributes: response.data[0] }))
+    // }
 
     componentDidMount () {
-        this.fetchAttributes()
+        // TODO: Fetch all shemas (backend ok)
+        // this.fetchAttributes()
         this.fetchProducts()
     }
 
+    /**
+     * Render all products (or search results) on index page
+     */
     renderProducts () {
         return this.state.onSearch ? <Products products={this.state.searchResults} onHandleDeleteProduct={this.handleDeleteProduct} />
             : <Products products={this.state.products} onHandleDeleteProduct={this.handleDeleteProduct} />

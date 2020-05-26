@@ -21,7 +21,7 @@ router.post('/add', (req, res) => {
     let errors = []
     // check form errors
     if(!req.body.image){
-        errors.push({text:'Please add a title'})
+        errors.push({text:'Please add an image'})
     }
     if(!req.body.name){
         errors.push({text:'Please add a name'})
@@ -40,12 +40,14 @@ router.post('/add', (req, res) => {
     if(errors.length > 0){
         res.status(OK).json(errors)
     } else {
+        console.log(req.body)
         const newProduct = {
             image: req.body.image,
             name: req.body.name,
             quantity: req.body.quantity,
             price: req.body.price,
-            colour: req.body.colour
+            colour: req.body.colour,
+            additionalAttribute: req.body.additionalAttribute
         }
         try{
             new Product(newProduct).save()
