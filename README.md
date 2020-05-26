@@ -9,7 +9,7 @@ Before you do anything, you need to install MongoDB.
 
 __Start the Server__
 
-- in `/server/config`, create a json file `awsConfig.json` and write in this file as follows:\
+- in `/server/config`, create a json file `awsConfig.json` and write in this file as follows:
 ```
 {
     "accessKeyId": "YOUR AWS ACESS KEY ID",
