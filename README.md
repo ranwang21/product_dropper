@@ -9,7 +9,7 @@ Before you do anything, you need to install MongoDB.
 
 __Start the Server__
 
-- in `/server/config/`, create a json file `awsConfig.json` and write in this file as follows:
+- Configure AWS S3: in `/server/config/`, create a json file `awsConfig.json` and write in this file as follows:
 ```
 {
     "accessKeyId": "YOUR AWS ACESS KEY ID",
@@ -18,6 +18,13 @@ __Start the Server__
 }
 ```
 Please note that you will need to allow public `put` and `read` to your S3 bucket.
+- Configure MongoDB atlas: you need to create a cluster in MongoDB cluster, create a JSON file `/server/config/default.json`, write copy paste code snippet as follows:
+```
+{
+  "mongoURI": "YOUR_MONGODB_CLUSTER_CONNECTION_URI"
+}
+
+```
 - Open terminal in the `/server` folder, make sure port `5000` in your localhost is available, then install the dependencies by `npm install`;
 - Start the local server `npm start`.
 - Note: if you need to run your MongoDB remotely, you need to create a JSON file `/server/config/default.json`, and write the following snippet:
